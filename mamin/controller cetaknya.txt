@@ -1,0 +1,31 @@
+==========================
+function edit ganti yg dibawah
+==========================
+
+
+
+
+public function cetak($id)
+    {
+       $data =DB::table('cetak_mamin as c')
+            ->join('dpa as d','c.id_dpa','=','d.id_dpa')
+            ->join('kegiatan as k','d.id_kegiatan','=','k.id_kegiatan')
+            ->where('c.id_mamin','=',$id)
+            ->first();
+        $ppk = DB::table('pegawai')
+            ->where('nip_pegawai',$data->ppk)
+            ->first();
+        $pptk = DB::table('pegawai')
+            ->where('nip_pegawai',$data->pptk)
+            ->first();
+        $bendahara = DB::table('pegawai')
+            ->where('bendahara',1)
+            ->first();
+        $bilang = $this->terbilang($data->nilai_mamin);
+        $view = View::make('mamin.cetak', array('data' => $data, 'bilang' => $bilang, 'ppk' => $ppk,'bendahara' => $bendahara,'pptk' => $pptk, 'i' => 0))->render(); 
+        $pdf = App::make('dompdf.wrapper');
+        $paper_orientation = 'pottrait';
+        $pdf->setpaper('a4',$paper_orientation);
+        $pdf->loadHTML($view);
+        return $pdf->stream();
+    }
